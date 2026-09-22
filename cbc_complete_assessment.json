@@ -1,0 +1,966 @@
+{
+  "primary_prediction": {
+    "name": "Infection-associated pattern",
+    "probability": 0.5893092930196838,
+    "confidence_level": "moderate"
+  },
+  "alternative_predictions": [
+    {
+      "name": "Leukopenia pattern",
+      "probability": 0.4053934065188833
+    },
+    {
+      "name": "Normal CBC pattern",
+      "probability": 0.0016256361170541105
+    },
+    {
+      "name": "Thrombocytopenia pattern",
+      "probability": 0.0014794467955821363
+    },
+    {
+      "name": "Pancytopenia pattern",
+      "probability": 0.0012871832229751894
+    }
+  ],
+  "all_primary_predictions": [
+    {
+      "name": "Infection-associated pattern",
+      "probability": 0.5893092930196838
+    },
+    {
+      "name": "Leukopenia pattern",
+      "probability": 0.4053934065188833
+    },
+    {
+      "name": "Normal CBC pattern",
+      "probability": 0.0016256361170541105
+    },
+    {
+      "name": "Thrombocytopenia pattern",
+      "probability": 0.0014794467955821363
+    },
+    {
+      "name": "Pancytopenia pattern",
+      "probability": 0.0012871832229751894
+    },
+    {
+      "name": "Other abnormal CBC pattern",
+      "probability": 0.0005164510435423489
+    },
+    {
+      "name": "Anemia-associated pattern",
+      "probability": 0.00014739703854133862
+    },
+    {
+      "name": "Inflammatory pattern",
+      "probability": 0.0001276668694294181
+    },
+    {
+      "name": "Leukocytosis pattern",
+      "probability": 9.556326308360054e-05
+    },
+    {
+      "name": "Erythrocytosis pattern",
+      "probability": 1.795611122480963e-05
+    }
+  ],
+  "disease_associated_signals": [
+    {
+      "name": "Dengue_signal",
+      "probability": 0.9480543769625226,
+      "ensemble_weights": {
+        "xgboost": 0.8500000000000001,
+        "lightgbm": 0.1499999999999999
+      },
+      "contributing_factors": [
+        {
+          "parameter": "Platelets",
+          "value": 92000.0,
+          "shap_value": 1.935751695064393,
+          "importance": 0.39158397765233666,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Neutrophils",
+          "value": 38.0,
+          "shap_value": 0.6553651570780072,
+          "importance": 0.1325740773869335,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800.0,
+          "shap_value": 0.5860248681589996,
+          "importance": 0.11854720285767521,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52.0,
+          "shap_value": 0.5465986426045524,
+          "importance": 0.11057165606322177,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": 0.22919390366103976,
+          "importance": 0.04636372561526849,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "BMI",
+          "value": 23.1,
+          "shap_value": -0.15601583016551487,
+          "importance": 0.03156050412287587,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Monocytes",
+          "value": 7.0,
+          "shap_value": -0.147095928269447,
+          "importance": 0.029756093632813153,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCV",
+          "value": 93.5,
+          "shap_value": -0.13664408851444076,
+          "importance": 0.027641786826064357,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Malaria_signal",
+      "probability": 0.19030232387808904,
+      "ensemble_weights": {
+        "xgboost": 0.6000000000000001,
+        "lightgbm": 0.3999999999999999
+      },
+      "contributing_factors": [
+        {
+          "parameter": "RBC",
+          "value": 4.04,
+          "shap_value": -1.8127476130591291,
+          "importance": 0.2733030721309853,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Platelets",
+          "value": 92000.0,
+          "shap_value": 1.3645084834435213,
+          "importance": 0.20572326659670623,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCH",
+          "value": 31.6,
+          "shap_value": 0.9846362752649929,
+          "importance": 0.14845095755354626,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.6274349938620266,
+          "importance": 0.09459668304050023,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": 0.5521914154682406,
+          "importance": 0.08325241151312154,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800.0,
+          "shap_value": 0.3397096708225542,
+          "importance": 0.051217111527031636,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Neutrophils",
+          "value": 38.0,
+          "shap_value": -0.289619265201436,
+          "importance": 0.04366511606891254,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52.0,
+          "shap_value": -0.18001284555710503,
+          "importance": 0.027140051576607774,
+          "direction": "away_from_signal"
+        }
+      ]
+    }
+  ],
+  "all_disease_associated_signals": [
+    {
+      "name": "Dengue_signal",
+      "probability": 0.9480543769625226,
+      "ensemble_weights": {
+        "xgboost": 0.8500000000000001,
+        "lightgbm": 0.1499999999999999
+      },
+      "contributing_factors": [
+        {
+          "parameter": "Platelets",
+          "value": 92000.0,
+          "shap_value": 1.935751695064393,
+          "importance": 0.39158397765233666,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Neutrophils",
+          "value": 38.0,
+          "shap_value": 0.6553651570780072,
+          "importance": 0.1325740773869335,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800.0,
+          "shap_value": 0.5860248681589996,
+          "importance": 0.11854720285767521,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52.0,
+          "shap_value": 0.5465986426045524,
+          "importance": 0.11057165606322177,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": 0.22919390366103976,
+          "importance": 0.04636372561526849,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "BMI",
+          "value": 23.1,
+          "shap_value": -0.15601583016551487,
+          "importance": 0.03156050412287587,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Monocytes",
+          "value": 7.0,
+          "shap_value": -0.147095928269447,
+          "importance": 0.029756093632813153,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCV",
+          "value": 93.5,
+          "shap_value": -0.13664408851444076,
+          "importance": 0.027641786826064357,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Malaria_signal",
+      "probability": 0.19030232387808904,
+      "ensemble_weights": {
+        "xgboost": 0.6000000000000001,
+        "lightgbm": 0.3999999999999999
+      },
+      "contributing_factors": [
+        {
+          "parameter": "RBC",
+          "value": 4.04,
+          "shap_value": -1.8127476130591291,
+          "importance": 0.2733030721309853,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Platelets",
+          "value": 92000.0,
+          "shap_value": 1.3645084834435213,
+          "importance": 0.20572326659670623,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCH",
+          "value": 31.6,
+          "shap_value": 0.9846362752649929,
+          "importance": 0.14845095755354626,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.6274349938620266,
+          "importance": 0.09459668304050023,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": 0.5521914154682406,
+          "importance": 0.08325241151312154,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800.0,
+          "shap_value": 0.3397096708225542,
+          "importance": 0.051217111527031636,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Neutrophils",
+          "value": 38.0,
+          "shap_value": -0.289619265201436,
+          "importance": 0.04366511606891254,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52.0,
+          "shap_value": -0.18001284555710503,
+          "importance": 0.027140051576607774,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Hemolytic_signal",
+      "probability": 0.0022228630609230355,
+      "ensemble_weights": {
+        "xgboost": 0.9,
+        "lightgbm": 0.09999999999999998
+      },
+      "contributing_factors": [
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": -5.181089535419857,
+          "importance": 0.640335121482179,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.6364565295268934,
+          "importance": 0.07866018650451738,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Height",
+          "value": 157.0,
+          "shap_value": -0.3571011355478776,
+          "importance": 0.0441344233581063,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Platelets",
+          "value": 92000.0,
+          "shap_value": -0.3156040137120775,
+          "importance": 0.03900575990416842,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52.0,
+          "shap_value": 0.2424738064864583,
+          "importance": 0.029967537382109832,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCHC",
+          "value": 33.8,
+          "shap_value": 0.22362866731939,
+          "importance": 0.027638451116489954,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCV",
+          "value": 93.5,
+          "shap_value": 0.20253200788263664,
+          "importance": 0.02503109760697241,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800.0,
+          "shap_value": -0.1963504987771068,
+          "importance": 0.02426711980713462,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Iron_deficiency_signal",
+      "probability": 0.0002430981459757016,
+      "ensemble_weights": {
+        "xgboost": 0.7000000000000001,
+        "lightgbm": 0.29999999999999993
+      },
+      "contributing_factors": [
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": -2.9123014687995203,
+          "importance": 0.3288574542479599,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCV",
+          "value": 93.5,
+          "shap_value": -2.3634189287041996,
+          "importance": 0.26687756763570386,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCHC",
+          "value": 33.8,
+          "shap_value": -1.0061198544547174,
+          "importance": 0.11361118261588977,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCH",
+          "value": 31.6,
+          "shap_value": -0.8381274623789878,
+          "importance": 0.09464146022179218,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "RBC",
+          "value": 4.04,
+          "shap_value": 0.49782498593377267,
+          "importance": 0.056214461067689965,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Neutrophils",
+          "value": 38.0,
+          "shap_value": 0.29808558220759046,
+          "importance": 0.033659862058585975,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52.0,
+          "shap_value": 0.25259097601682406,
+          "importance": 0.028522605310205427,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.21237158428366035,
+          "importance": 0.023981026452910222,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Megaloblastic_signal",
+      "probability": 5.8321555231306976e-05,
+      "ensemble_weights": {
+        "xgboost": 0.35000000000000003,
+        "lightgbm": 0.6499999999999999
+      },
+      "contributing_factors": [
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": -2.562962856152971,
+          "importance": 0.33681795283118326,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "RBC",
+          "value": 4.04,
+          "shap_value": -1.3817543175170386,
+          "importance": 0.18158658032223945,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.8123967343142835,
+          "importance": 0.1067630786304864,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCH",
+          "value": 31.6,
+          "shap_value": 0.749500282874363,
+          "importance": 0.09849738958100158,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCHC",
+          "value": 33.8,
+          "shap_value": -0.4681597772019139,
+          "importance": 0.061524347641829444,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800.0,
+          "shap_value": 0.3521206720868377,
+          "importance": 0.0462747884297666,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Age",
+          "value": 24.0,
+          "shap_value": -0.24241041231244076,
+          "importance": 0.03185694971116123,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Height",
+          "value": 157.0,
+          "shap_value": 0.1677557635612946,
+          "importance": 0.022046028768110577,
+          "direction": "toward_signal"
+        }
+      ]
+    }
+  ],
+  "contributing_factors": [
+    {
+      "parameter": "Lymphocytes",
+      "value": 52.0,
+      "shap_value": 1.815507405698652,
+      "importance": 0.3795328134130997,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "Neutrophils",
+      "value": 38.0,
+      "shap_value": 1.3700939087325574,
+      "importance": 0.28641887892564727,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "Platelets",
+      "value": 92000.0,
+      "shap_value": -0.414103274894823,
+      "importance": 0.08656851548558081,
+      "direction": "away_from_prediction"
+    },
+    {
+      "parameter": "Eosinophils",
+      "value": 2.0,
+      "shap_value": 0.1928828355851015,
+      "importance": 0.04032226198523199,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "Monocytes",
+      "value": 7.0,
+      "shap_value": -0.17271177237350233,
+      "importance": 0.0361054902187265,
+      "direction": "away_from_prediction"
+    },
+    {
+      "parameter": "RDW",
+      "value": 12.5,
+      "shap_value": 0.14757388819892497,
+      "importance": 0.03085040182080366,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "Hb",
+      "value": 12.8,
+      "shap_value": 0.1419268430578354,
+      "importance": 0.029669883953930113,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "WBC",
+      "value": 3800.0,
+      "shap_value": -0.12650812859139057,
+      "importance": 0.026446593284724,
+      "direction": "away_from_prediction"
+    }
+  ],
+  "pattern_summary": "Below range: WBC, Platelets, Neutrophils | Above range: Lymphocytes",
+  "key_pattern": [
+    {
+      "label": "Lymphocytes",
+      "direction": "high",
+      "value": 52.0,
+      "unit": "%"
+    },
+    {
+      "label": "Neutrophils",
+      "direction": "low",
+      "value": 38.0,
+      "unit": "%"
+    },
+    {
+      "label": "Platelets",
+      "direction": "low",
+      "value": 92000.0,
+      "unit": "/\u00b5L"
+    }
+  ],
+  "pattern_caption": "Observed CBC findings contributing to the assessment",
+  "cbc_results": [
+    {
+      "parameter": "Hemoglobin",
+      "key": "Hb",
+      "value": 12.8,
+      "value_display": "12.8",
+      "unit": "g/dL",
+      "status": "normal",
+      "reference_range": "12\u201317.5",
+      "message": "Hemoglobin is within the configured reference range."
+    },
+    {
+      "parameter": "RBC",
+      "key": "RBC",
+      "value": 4.04,
+      "value_display": "4.04",
+      "unit": "million/\u00b5L",
+      "status": "normal",
+      "reference_range": "4\u20136",
+      "message": "RBC is within the configured reference range."
+    },
+    {
+      "parameter": "WBC",
+      "key": "WBC",
+      "value": 3800.0,
+      "value_display": "3,800",
+      "unit": "/\u00b5L",
+      "status": "low",
+      "reference_range": "4000\u201311000",
+      "message": "WBC is below the configured reference range."
+    },
+    {
+      "parameter": "Platelets",
+      "key": "Platelets",
+      "value": 92000.0,
+      "value_display": "92,000",
+      "unit": "/\u00b5L",
+      "status": "low",
+      "reference_range": "150000\u2013450000",
+      "message": "Platelets is below the configured reference range."
+    },
+    {
+      "parameter": "Neutrophils",
+      "key": "Neutrophils",
+      "value": 38.0,
+      "value_display": "38.0",
+      "unit": "%",
+      "status": "low",
+      "reference_range": "40\u201370",
+      "message": "Neutrophils is below the configured reference range."
+    },
+    {
+      "parameter": "Lymphocytes",
+      "key": "Lymphocytes",
+      "value": 52.0,
+      "value_display": "52.0",
+      "unit": "%",
+      "status": "high",
+      "reference_range": "20\u201340",
+      "message": "Lymphocytes is above the configured reference range."
+    },
+    {
+      "parameter": "Monocytes",
+      "key": "Monocytes",
+      "value": 7.0,
+      "value_display": "7.0",
+      "unit": "%",
+      "status": "normal",
+      "reference_range": "2\u201310",
+      "message": "Monocytes is within the configured reference range."
+    },
+    {
+      "parameter": "Eosinophils",
+      "key": "Eosinophils",
+      "value": 2.0,
+      "value_display": "2.0",
+      "unit": "%",
+      "status": "normal",
+      "reference_range": "0\u20136",
+      "message": "Eosinophils is within the configured reference range."
+    },
+    {
+      "parameter": "Basophils",
+      "key": "Basophils",
+      "value": 1.0,
+      "value_display": "1.0",
+      "unit": "%",
+      "status": "normal",
+      "reference_range": "0\u20132",
+      "message": "Basophils is within the configured reference range."
+    },
+    {
+      "parameter": "MCV",
+      "key": "MCV",
+      "value": 93.5,
+      "value_display": "93.5",
+      "unit": "fL",
+      "status": "normal",
+      "reference_range": "80\u2013100",
+      "message": "MCV is within the configured reference range."
+    },
+    {
+      "parameter": "MCH",
+      "key": "MCH",
+      "value": 31.6,
+      "value_display": "31.6",
+      "unit": "pg",
+      "status": "normal",
+      "reference_range": "27\u201333",
+      "message": "MCH is within the configured reference range."
+    },
+    {
+      "parameter": "MCHC",
+      "key": "MCHC",
+      "value": 33.8,
+      "value_display": "33.8",
+      "unit": "g/dL",
+      "status": "normal",
+      "reference_range": "32\u201336",
+      "message": "MCHC is within the configured reference range."
+    },
+    {
+      "parameter": "RDW",
+      "key": "RDW",
+      "value": 12.5,
+      "value_display": "12.5",
+      "unit": "%",
+      "status": "normal",
+      "reference_range": "11.5\u201314.5",
+      "message": "RDW is within the configured reference range."
+    }
+  ],
+  "grouped_results": {
+    "rbc": [
+      {
+        "parameter": "Hemoglobin",
+        "key": "Hb",
+        "value": 12.8,
+        "value_display": "12.8",
+        "unit": "g/dL",
+        "status": "normal",
+        "reference_range": "12\u201317.5",
+        "message": "Hemoglobin is within the configured reference range."
+      },
+      {
+        "parameter": "RBC",
+        "key": "RBC",
+        "value": 4.04,
+        "value_display": "4.04",
+        "unit": "million/\u00b5L",
+        "status": "normal",
+        "reference_range": "4\u20136",
+        "message": "RBC is within the configured reference range."
+      },
+      {
+        "parameter": "MCV",
+        "key": "MCV",
+        "value": 93.5,
+        "value_display": "93.5",
+        "unit": "fL",
+        "status": "normal",
+        "reference_range": "80\u2013100",
+        "message": "MCV is within the configured reference range."
+      },
+      {
+        "parameter": "MCH",
+        "key": "MCH",
+        "value": 31.6,
+        "value_display": "31.6",
+        "unit": "pg",
+        "status": "normal",
+        "reference_range": "27\u201333",
+        "message": "MCH is within the configured reference range."
+      },
+      {
+        "parameter": "MCHC",
+        "key": "MCHC",
+        "value": 33.8,
+        "value_display": "33.8",
+        "unit": "g/dL",
+        "status": "normal",
+        "reference_range": "32\u201336",
+        "message": "MCHC is within the configured reference range."
+      },
+      {
+        "parameter": "RDW",
+        "key": "RDW",
+        "value": 12.5,
+        "value_display": "12.5",
+        "unit": "%",
+        "status": "normal",
+        "reference_range": "11.5\u201314.5",
+        "message": "RDW is within the configured reference range."
+      }
+    ],
+    "wbc": [
+      {
+        "parameter": "WBC",
+        "key": "WBC",
+        "value": 3800.0,
+        "value_display": "3,800",
+        "unit": "/\u00b5L",
+        "status": "low",
+        "reference_range": "4000\u201311000",
+        "message": "WBC is below the configured reference range."
+      },
+      {
+        "parameter": "Neutrophils",
+        "key": "Neutrophils",
+        "value": 38.0,
+        "value_display": "38.0",
+        "unit": "%",
+        "status": "low",
+        "reference_range": "40\u201370",
+        "message": "Neutrophils is below the configured reference range."
+      },
+      {
+        "parameter": "Lymphocytes",
+        "key": "Lymphocytes",
+        "value": 52.0,
+        "value_display": "52.0",
+        "unit": "%",
+        "status": "high",
+        "reference_range": "20\u201340",
+        "message": "Lymphocytes is above the configured reference range."
+      },
+      {
+        "parameter": "Monocytes",
+        "key": "Monocytes",
+        "value": 7.0,
+        "value_display": "7.0",
+        "unit": "%",
+        "status": "normal",
+        "reference_range": "2\u201310",
+        "message": "Monocytes is within the configured reference range."
+      },
+      {
+        "parameter": "Eosinophils",
+        "key": "Eosinophils",
+        "value": 2.0,
+        "value_display": "2.0",
+        "unit": "%",
+        "status": "normal",
+        "reference_range": "0\u20136",
+        "message": "Eosinophils is within the configured reference range."
+      },
+      {
+        "parameter": "Basophils",
+        "key": "Basophils",
+        "value": 1.0,
+        "value_display": "1.0",
+        "unit": "%",
+        "status": "normal",
+        "reference_range": "0\u20132",
+        "message": "Basophils is within the configured reference range."
+      }
+    ],
+    "platelet": [
+      {
+        "parameter": "Platelets",
+        "key": "Platelets",
+        "value": 92000.0,
+        "value_display": "92,000",
+        "unit": "/\u00b5L",
+        "status": "low",
+        "reference_range": "150000\u2013450000",
+        "message": "Platelets is below the configured reference range."
+      }
+    ]
+  },
+  "lineage_overview": [
+    {
+      "lineage": "RBC Status",
+      "status": "normal"
+    },
+    {
+      "lineage": "WBC Status",
+      "status": "mixed abnormal"
+    },
+    {
+      "lineage": "Platelet Status",
+      "status": "low"
+    }
+  ],
+  "supporting_evidence": [
+    {
+      "strength": "strong",
+      "items": [
+        "WBC is below the configured reference range.",
+        "Platelets is below the configured reference range."
+      ]
+    },
+    {
+      "strength": "moderate",
+      "items": [
+        "Neutrophils is below the configured reference range.",
+        "Lymphocytes is above the configured reference range."
+      ]
+    }
+  ],
+  "abnormal_results": [
+    {
+      "parameter": "WBC",
+      "key": "WBC",
+      "value": 3800.0,
+      "value_display": "3,800",
+      "unit": "/\u00b5L",
+      "status": "low",
+      "reference_range": "4000\u201311000",
+      "message": "WBC is below the configured reference range."
+    },
+    {
+      "parameter": "Platelets",
+      "key": "Platelets",
+      "value": 92000.0,
+      "value_display": "92,000",
+      "unit": "/\u00b5L",
+      "status": "low",
+      "reference_range": "150000\u2013450000",
+      "message": "Platelets is below the configured reference range."
+    },
+    {
+      "parameter": "Neutrophils",
+      "key": "Neutrophils",
+      "value": 38.0,
+      "value_display": "38.0",
+      "unit": "%",
+      "status": "low",
+      "reference_range": "40\u201370",
+      "message": "Neutrophils is below the configured reference range."
+    },
+    {
+      "parameter": "Lymphocytes",
+      "key": "Lymphocytes",
+      "value": 52.0,
+      "value_display": "52.0",
+      "unit": "%",
+      "status": "high",
+      "reference_range": "20\u201340",
+      "message": "Lymphocytes is above the configured reference range."
+    }
+  ],
+  "severity": "attention",
+  "clinical_flag_message": "One or more CBC values are outside the configured prototype reference ranges and may warrant clinical review.",
+  "follow_up": [
+    "Correlate CBC findings with the patient's clinical presentation and applicable laboratory reference intervals.",
+    "Consider repeat CBC or additional evaluation when clinically indicated."
+  ],
+  "model_info": {
+    "name": "Aarogyam CBC Multi-Task Ensemble",
+    "version": "3.0"
+  },
+  "disclaimer": "AI-generated CBC-based assessment. This prototype is intended to support review and is not a definitive diagnosis."
+}

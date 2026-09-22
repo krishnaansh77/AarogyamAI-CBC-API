@@ -1,0 +1,352 @@
+{
+  "cbc_results": [
+    {
+      "parameter": "Hemoglobin",
+      "key": "Hb",
+      "value": 12.8,
+      "value_display": "12.8",
+      "unit": "g/dL",
+      "status": "normal",
+      "reference_range": "12\u201317.5",
+      "message": "Hemoglobin is within the configured reference range."
+    },
+    {
+      "parameter": "RBC",
+      "key": "RBC",
+      "value": 4.04,
+      "value_display": "4.04",
+      "unit": "million/\u00b5L",
+      "status": "normal",
+      "reference_range": "4\u20136",
+      "message": "RBC is within the configured reference range."
+    },
+    {
+      "parameter": "WBC",
+      "key": "WBC",
+      "value": 3800.0,
+      "value_display": "3,800",
+      "unit": "/\u00b5L",
+      "status": "low",
+      "reference_range": "4000\u201311000",
+      "message": "WBC is below the configured reference range."
+    },
+    {
+      "parameter": "Platelets",
+      "key": "Platelets",
+      "value": 92000.0,
+      "value_display": "92,000",
+      "unit": "/\u00b5L",
+      "status": "low",
+      "reference_range": "150000\u2013450000",
+      "message": "Platelets is below the configured reference range."
+    },
+    {
+      "parameter": "Neutrophils",
+      "key": "Neutrophils",
+      "value": 38.0,
+      "value_display": "38.0",
+      "unit": "%",
+      "status": "low",
+      "reference_range": "40\u201370",
+      "message": "Neutrophils is below the configured reference range."
+    },
+    {
+      "parameter": "Lymphocytes",
+      "key": "Lymphocytes",
+      "value": 52.0,
+      "value_display": "52.0",
+      "unit": "%",
+      "status": "high",
+      "reference_range": "20\u201340",
+      "message": "Lymphocytes is above the configured reference range."
+    },
+    {
+      "parameter": "Monocytes",
+      "key": "Monocytes",
+      "value": 7.0,
+      "value_display": "7.0",
+      "unit": "%",
+      "status": "normal",
+      "reference_range": "2\u201310",
+      "message": "Monocytes is within the configured reference range."
+    },
+    {
+      "parameter": "Eosinophils",
+      "key": "Eosinophils",
+      "value": 2.0,
+      "value_display": "2.0",
+      "unit": "%",
+      "status": "normal",
+      "reference_range": "0\u20136",
+      "message": "Eosinophils is within the configured reference range."
+    },
+    {
+      "parameter": "Basophils",
+      "key": "Basophils",
+      "value": 1.0,
+      "value_display": "1.0",
+      "unit": "%",
+      "status": "normal",
+      "reference_range": "0\u20132",
+      "message": "Basophils is within the configured reference range."
+    },
+    {
+      "parameter": "MCV",
+      "key": "MCV",
+      "value": 93.5,
+      "value_display": "93.5",
+      "unit": "fL",
+      "status": "normal",
+      "reference_range": "80\u2013100",
+      "message": "MCV is within the configured reference range."
+    },
+    {
+      "parameter": "MCH",
+      "key": "MCH",
+      "value": 31.6,
+      "value_display": "31.6",
+      "unit": "pg",
+      "status": "normal",
+      "reference_range": "27\u201333",
+      "message": "MCH is within the configured reference range."
+    },
+    {
+      "parameter": "MCHC",
+      "key": "MCHC",
+      "value": 33.8,
+      "value_display": "33.8",
+      "unit": "g/dL",
+      "status": "normal",
+      "reference_range": "32\u201336",
+      "message": "MCHC is within the configured reference range."
+    },
+    {
+      "parameter": "RDW",
+      "key": "RDW",
+      "value": 12.5,
+      "value_display": "12.5",
+      "unit": "%",
+      "status": "normal",
+      "reference_range": "11.5\u201314.5",
+      "message": "RDW is within the configured reference range."
+    }
+  ],
+  "grouped_results": {
+    "rbc": [
+      {
+        "parameter": "Hemoglobin",
+        "key": "Hb",
+        "value": 12.8,
+        "value_display": "12.8",
+        "unit": "g/dL",
+        "status": "normal",
+        "reference_range": "12\u201317.5",
+        "message": "Hemoglobin is within the configured reference range."
+      },
+      {
+        "parameter": "RBC",
+        "key": "RBC",
+        "value": 4.04,
+        "value_display": "4.04",
+        "unit": "million/\u00b5L",
+        "status": "normal",
+        "reference_range": "4\u20136",
+        "message": "RBC is within the configured reference range."
+      },
+      {
+        "parameter": "MCV",
+        "key": "MCV",
+        "value": 93.5,
+        "value_display": "93.5",
+        "unit": "fL",
+        "status": "normal",
+        "reference_range": "80\u2013100",
+        "message": "MCV is within the configured reference range."
+      },
+      {
+        "parameter": "MCH",
+        "key": "MCH",
+        "value": 31.6,
+        "value_display": "31.6",
+        "unit": "pg",
+        "status": "normal",
+        "reference_range": "27\u201333",
+        "message": "MCH is within the configured reference range."
+      },
+      {
+        "parameter": "MCHC",
+        "key": "MCHC",
+        "value": 33.8,
+        "value_display": "33.8",
+        "unit": "g/dL",
+        "status": "normal",
+        "reference_range": "32\u201336",
+        "message": "MCHC is within the configured reference range."
+      },
+      {
+        "parameter": "RDW",
+        "key": "RDW",
+        "value": 12.5,
+        "value_display": "12.5",
+        "unit": "%",
+        "status": "normal",
+        "reference_range": "11.5\u201314.5",
+        "message": "RDW is within the configured reference range."
+      }
+    ],
+    "wbc": [
+      {
+        "parameter": "WBC",
+        "key": "WBC",
+        "value": 3800.0,
+        "value_display": "3,800",
+        "unit": "/\u00b5L",
+        "status": "low",
+        "reference_range": "4000\u201311000",
+        "message": "WBC is below the configured reference range."
+      },
+      {
+        "parameter": "Neutrophils",
+        "key": "Neutrophils",
+        "value": 38.0,
+        "value_display": "38.0",
+        "unit": "%",
+        "status": "low",
+        "reference_range": "40\u201370",
+        "message": "Neutrophils is below the configured reference range."
+      },
+      {
+        "parameter": "Lymphocytes",
+        "key": "Lymphocytes",
+        "value": 52.0,
+        "value_display": "52.0",
+        "unit": "%",
+        "status": "high",
+        "reference_range": "20\u201340",
+        "message": "Lymphocytes is above the configured reference range."
+      },
+      {
+        "parameter": "Monocytes",
+        "key": "Monocytes",
+        "value": 7.0,
+        "value_display": "7.0",
+        "unit": "%",
+        "status": "normal",
+        "reference_range": "2\u201310",
+        "message": "Monocytes is within the configured reference range."
+      },
+      {
+        "parameter": "Eosinophils",
+        "key": "Eosinophils",
+        "value": 2.0,
+        "value_display": "2.0",
+        "unit": "%",
+        "status": "normal",
+        "reference_range": "0\u20136",
+        "message": "Eosinophils is within the configured reference range."
+      },
+      {
+        "parameter": "Basophils",
+        "key": "Basophils",
+        "value": 1.0,
+        "value_display": "1.0",
+        "unit": "%",
+        "status": "normal",
+        "reference_range": "0\u20132",
+        "message": "Basophils is within the configured reference range."
+      }
+    ],
+    "platelet": [
+      {
+        "parameter": "Platelets",
+        "key": "Platelets",
+        "value": 92000.0,
+        "value_display": "92,000",
+        "unit": "/\u00b5L",
+        "status": "low",
+        "reference_range": "150000\u2013450000",
+        "message": "Platelets is below the configured reference range."
+      }
+    ]
+  },
+  "lineage_overview": [
+    {
+      "lineage": "RBC Status",
+      "status": "normal"
+    },
+    {
+      "lineage": "WBC Status",
+      "status": "mixed abnormal"
+    },
+    {
+      "lineage": "Platelet Status",
+      "status": "low"
+    }
+  ],
+  "abnormal_results": [
+    {
+      "parameter": "WBC",
+      "key": "WBC",
+      "value": 3800.0,
+      "value_display": "3,800",
+      "unit": "/\u00b5L",
+      "status": "low",
+      "reference_range": "4000\u201311000",
+      "message": "WBC is below the configured reference range."
+    },
+    {
+      "parameter": "Platelets",
+      "key": "Platelets",
+      "value": 92000.0,
+      "value_display": "92,000",
+      "unit": "/\u00b5L",
+      "status": "low",
+      "reference_range": "150000\u2013450000",
+      "message": "Platelets is below the configured reference range."
+    },
+    {
+      "parameter": "Neutrophils",
+      "key": "Neutrophils",
+      "value": 38.0,
+      "value_display": "38.0",
+      "unit": "%",
+      "status": "low",
+      "reference_range": "40\u201370",
+      "message": "Neutrophils is below the configured reference range."
+    },
+    {
+      "parameter": "Lymphocytes",
+      "key": "Lymphocytes",
+      "value": 52.0,
+      "value_display": "52.0",
+      "unit": "%",
+      "status": "high",
+      "reference_range": "20\u201340",
+      "message": "Lymphocytes is above the configured reference range."
+    }
+  ],
+  "severity": "attention",
+  "clinical_flag_message": "One or more CBC values are outside the configured prototype reference ranges and may warrant clinical review.",
+  "follow_up": [
+    "Correlate CBC findings with the patient's clinical presentation and applicable laboratory reference intervals.",
+    "Consider repeat CBC or additional evaluation when clinically indicated."
+  ],
+  "pattern_summary": "Below range: WBC, Platelets, Neutrophils | Above range: Lymphocytes",
+  "reference_range_source": "Prototype configurable ranges \u2014 replace with validated laboratory-specific ranges before clinical use.",
+  "supporting_evidence": [
+    {
+      "strength": "strong",
+      "items": [
+        "WBC is below the configured reference range.",
+        "Platelets is below the configured reference range."
+      ]
+    },
+    {
+      "strength": "moderate",
+      "items": [
+        "Neutrophils is below the configured reference range.",
+        "Lymphocytes is above the configured reference range."
+      ]
+    }
+  ]
+}

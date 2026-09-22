@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+python-dotenv
+google-genai
+joblib
+numpy
+pandas
+scikit-learn
+xgboost
+lightgbm
+shap

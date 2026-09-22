@@ -1,0 +1,433 @@
+{
+  "primary_prediction": {
+    "name": "Infection-associated pattern",
+    "probability": 0.5893092930196838,
+    "confidence_level": "moderate"
+  },
+  "primary_predictions": [
+    {
+      "name": "Infection-associated pattern",
+      "probability": 0.5893092930196838
+    },
+    {
+      "name": "Leukopenia pattern",
+      "probability": 0.4053934065188833
+    },
+    {
+      "name": "Normal CBC pattern",
+      "probability": 0.0016256361170541105
+    },
+    {
+      "name": "Thrombocytopenia pattern",
+      "probability": 0.0014794467955821363
+    },
+    {
+      "name": "Pancytopenia pattern",
+      "probability": 0.0012871832229751894
+    },
+    {
+      "name": "Other abnormal CBC pattern",
+      "probability": 0.0005164510435423489
+    },
+    {
+      "name": "Anemia-associated pattern",
+      "probability": 0.00014739703854133862
+    },
+    {
+      "name": "Inflammatory pattern",
+      "probability": 0.0001276668694294181
+    },
+    {
+      "name": "Leukocytosis pattern",
+      "probability": 9.556326308360054e-05
+    },
+    {
+      "name": "Erythrocytosis pattern",
+      "probability": 1.795611122480963e-05
+    }
+  ],
+  "disease_associated_signals": [
+    {
+      "name": "Dengue_signal",
+      "probability": 0.9480543769625226,
+      "xgboost_weight": 0.8500000000000001,
+      "lightgbm_weight": 0.1499999999999999,
+      "contributing_factors": [
+        {
+          "parameter": "Platelets",
+          "value": 92000,
+          "shap_value": 1.935751695064393,
+          "absolute_importance": 1.935751695064393,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Neutrophils",
+          "value": 38,
+          "shap_value": 0.6553651570780072,
+          "absolute_importance": 0.6553651570780072,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800,
+          "shap_value": 0.5860248681589996,
+          "absolute_importance": 0.5860248681589996,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52,
+          "shap_value": 0.5465986426045524,
+          "absolute_importance": 0.5465986426045524,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": 0.22919390366103976,
+          "absolute_importance": 0.22919390366103976,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "BMI",
+          "value": 23.1,
+          "shap_value": -0.15601583016551487,
+          "absolute_importance": 0.15601583016551487,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Monocytes",
+          "value": 7,
+          "shap_value": -0.147095928269447,
+          "absolute_importance": 0.147095928269447,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCV",
+          "value": 93.5,
+          "shap_value": -0.13664408851444076,
+          "absolute_importance": 0.13664408851444076,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Malaria_signal",
+      "probability": 0.19030232387808904,
+      "xgboost_weight": 0.6000000000000001,
+      "lightgbm_weight": 0.3999999999999999,
+      "contributing_factors": [
+        {
+          "parameter": "RBC",
+          "value": 4.04,
+          "shap_value": -1.8127476130591291,
+          "absolute_importance": 1.8127476130591291,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Platelets",
+          "value": 92000,
+          "shap_value": 1.3645084834435213,
+          "absolute_importance": 1.3645084834435213,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCH",
+          "value": 31.6,
+          "shap_value": 0.9846362752649929,
+          "absolute_importance": 0.9846362752649929,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.6274349938620266,
+          "absolute_importance": 0.6274349938620266,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": 0.5521914154682406,
+          "absolute_importance": 0.5521914154682406,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800,
+          "shap_value": 0.3397096708225542,
+          "absolute_importance": 0.3397096708225542,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Neutrophils",
+          "value": 38,
+          "shap_value": -0.289619265201436,
+          "absolute_importance": 0.289619265201436,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52,
+          "shap_value": -0.18001284555710503,
+          "absolute_importance": 0.18001284555710503,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Hemolytic_signal",
+      "probability": 0.0022228630609230355,
+      "xgboost_weight": 0.9,
+      "lightgbm_weight": 0.09999999999999998,
+      "contributing_factors": [
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": -5.181089535419857,
+          "absolute_importance": 5.181089535419857,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.6364565295268934,
+          "absolute_importance": 0.6364565295268934,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Height",
+          "value": 157,
+          "shap_value": -0.3571011355478776,
+          "absolute_importance": 0.3571011355478776,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Platelets",
+          "value": 92000,
+          "shap_value": -0.3156040137120775,
+          "absolute_importance": 0.3156040137120775,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52,
+          "shap_value": 0.2424738064864583,
+          "absolute_importance": 0.2424738064864583,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCHC",
+          "value": 33.8,
+          "shap_value": 0.22362866731939,
+          "absolute_importance": 0.22362866731939,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCV",
+          "value": 93.5,
+          "shap_value": 0.20253200788263664,
+          "absolute_importance": 0.20253200788263664,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800,
+          "shap_value": -0.1963504987771068,
+          "absolute_importance": 0.1963504987771068,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Iron_deficiency_signal",
+      "probability": 0.0002430981459757016,
+      "xgboost_weight": 0.7000000000000001,
+      "lightgbm_weight": 0.29999999999999993,
+      "contributing_factors": [
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": -2.9123014687995203,
+          "absolute_importance": 2.9123014687995203,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCV",
+          "value": 93.5,
+          "shap_value": -2.3634189287041996,
+          "absolute_importance": 2.3634189287041996,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCHC",
+          "value": 33.8,
+          "shap_value": -1.0061198544547174,
+          "absolute_importance": 1.0061198544547174,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCH",
+          "value": 31.6,
+          "shap_value": -0.8381274623789878,
+          "absolute_importance": 0.8381274623789878,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "RBC",
+          "value": 4.04,
+          "shap_value": 0.49782498593377267,
+          "absolute_importance": 0.49782498593377267,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Neutrophils",
+          "value": 38,
+          "shap_value": 0.29808558220759046,
+          "absolute_importance": 0.29808558220759046,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Lymphocytes",
+          "value": 52,
+          "shap_value": 0.25259097601682406,
+          "absolute_importance": 0.25259097601682406,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.21237158428366035,
+          "absolute_importance": 0.21237158428366035,
+          "direction": "away_from_signal"
+        }
+      ]
+    },
+    {
+      "name": "Megaloblastic_signal",
+      "probability": 5.8321555231306976e-05,
+      "xgboost_weight": 0.35000000000000003,
+      "lightgbm_weight": 0.6499999999999999,
+      "contributing_factors": [
+        {
+          "parameter": "RDW",
+          "value": 12.5,
+          "shap_value": -2.562962856152971,
+          "absolute_importance": 2.562962856152971,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "RBC",
+          "value": 4.04,
+          "shap_value": -1.3817543175170386,
+          "absolute_importance": 1.3817543175170386,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Hb",
+          "value": 12.8,
+          "shap_value": -0.8123967343142835,
+          "absolute_importance": 0.8123967343142835,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "MCH",
+          "value": 31.6,
+          "shap_value": 0.749500282874363,
+          "absolute_importance": 0.749500282874363,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "MCHC",
+          "value": 33.8,
+          "shap_value": -0.4681597772019139,
+          "absolute_importance": 0.4681597772019139,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "WBC",
+          "value": 3800,
+          "shap_value": 0.3521206720868377,
+          "absolute_importance": 0.3521206720868377,
+          "direction": "toward_signal"
+        },
+        {
+          "parameter": "Age",
+          "value": 24,
+          "shap_value": -0.24241041231244076,
+          "absolute_importance": 0.24241041231244076,
+          "direction": "away_from_signal"
+        },
+        {
+          "parameter": "Height",
+          "value": 157,
+          "shap_value": 0.1677557635612946,
+          "absolute_importance": 0.1677557635612946,
+          "direction": "toward_signal"
+        }
+      ]
+    }
+  ],
+  "contributing_factors": [
+    {
+      "parameter": "Lymphocytes",
+      "value": 52,
+      "shap_value": 1.815507405698652,
+      "absolute_importance": 1.815507405698652,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "Neutrophils",
+      "value": 38,
+      "shap_value": 1.3700939087325574,
+      "absolute_importance": 1.3700939087325574,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "Platelets",
+      "value": 92000,
+      "shap_value": -0.414103274894823,
+      "absolute_importance": 0.414103274894823,
+      "direction": "away_from_prediction"
+    },
+    {
+      "parameter": "Eosinophils",
+      "value": 2,
+      "shap_value": 0.1928828355851015,
+      "absolute_importance": 0.1928828355851015,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "Monocytes",
+      "value": 7,
+      "shap_value": -0.17271177237350233,
+      "absolute_importance": 0.17271177237350233,
+      "direction": "away_from_prediction"
+    },
+    {
+      "parameter": "RDW",
+      "value": 12.5,
+      "shap_value": 0.14757388819892497,
+      "absolute_importance": 0.14757388819892497,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "Hb",
+      "value": 12.8,
+      "shap_value": 0.1419268430578354,
+      "absolute_importance": 0.1419268430578354,
+      "direction": "toward_prediction"
+    },
+    {
+      "parameter": "WBC",
+      "value": 3800,
+      "shap_value": -0.12650812859139057,
+      "absolute_importance": 0.12650812859139057,
+      "direction": "away_from_prediction"
+    }
+  ],
+  "model_info": {
+    "name": "Aarogyam CBC Multi-Task Ensemble",
+    "version": "3.0"
+  }
+}
