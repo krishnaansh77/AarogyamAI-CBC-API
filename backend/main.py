@@ -44,6 +44,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "https://eternixx1-72ggkaihn-krishnaansh77s-projects.vercel.app",
         "https://eternixx1.vercel.app",
+        "https://eternixx1.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
