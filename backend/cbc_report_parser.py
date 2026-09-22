@@ -42,11 +42,13 @@
 import json
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 from pydantic import BaseModel, Field
 
 
@@ -70,9 +72,22 @@ if not API_KEY:
 # ============================================================
 # GEMINI CLIENT
 # ============================================================
+#
+# Disable the SDK's long automatic retry cycle.
+# We handle temporary 503 failures ourselves using
+# model fallback below.
+# ============================================================
 
 client = genai.Client(
-    api_key=API_KEY
+    api_key=API_KEY,
+    http_options=types.HttpOptions(
+        retry_options=types.HttpRetryOptions(
+            attempts=1,
+            initial_delay=1,
+            max_delay=1,
+            jitter=0,
+        )
+    ),
 )
 
 
@@ -130,6 +145,7 @@ class CBCExtraction(BaseModel):
     Hb: CBCMeasurement = Field(default_factory=CBCMeasurement)
     RBC: CBCMeasurement = Field(default_factory=CBCMeasurement)
     WBC: CBCMeasurement = Field(default_factory=CBCMeasurement)
+
     Platelets: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
@@ -137,15 +153,19 @@ class CBCExtraction(BaseModel):
     Neutrophils: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
+
     Lymphocytes: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
+
     Monocytes: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
+
     Eosinophils: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
+
     Basophils: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
@@ -153,12 +173,15 @@ class CBCExtraction(BaseModel):
     MCV: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
+
     MCH: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
+
     MCHC: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
+
     RDW: CBCMeasurement = Field(
         default_factory=CBCMeasurement
     )
@@ -297,6 +320,7 @@ ALLOWED_EXTENSIONS = {
 
 
 def validate_file(file_path: str) -> Path:
+
     path = Path(file_path)
 
     if not path.exists():
@@ -473,6 +497,7 @@ def convert_to_canonical(
     """
 
     value = safe_float(value)
+
     raw_unit = normalize_unit(unit)
 
     canonical = CANONICAL_UNITS[field]
@@ -482,6 +507,7 @@ def convert_to_canonical(
     # ========================================================
 
     if value is None:
+
         return conversion(
             None,
             canonical,
@@ -501,6 +527,7 @@ def convert_to_canonical(
             "g/dl",
             "g/dl.",
         }:
+
             return conversion(
                 value,
                 "g/dL",
@@ -511,6 +538,7 @@ def convert_to_canonical(
 
         # g/L -> g/dL
         if raw_unit == "g/l":
+
             return conversion(
                 value / 10.0,
                 "g/dL",
@@ -521,6 +549,7 @@ def convert_to_canonical(
 
         # Unit missing
         if not raw_unit and 4 <= value <= 25:
+
             return conversion(
                 value,
                 "g/dL",
@@ -550,6 +579,7 @@ def convert_to_canonical(
             "million/μl",
             "million/uµl",
         }:
+
             return conversion(
                 value,
                 "million/µL",
@@ -565,6 +595,7 @@ def convert_to_canonical(
             "10¹²/l",
             "x10¹²/l",
         }:
+
             return conversion(
                 value,
                 "million/µL",
@@ -575,6 +606,7 @@ def convert_to_canonical(
 
         # Unit missing
         if not raw_unit and 1 <= value <= 10:
+
             return conversion(
                 value,
                 "million/µL",
@@ -605,6 +637,7 @@ def convert_to_canonical(
             "cell/µl",
             "perµl",
         }:
+
             return conversion(
                 value,
                 "/µL",
@@ -620,6 +653,7 @@ def convert_to_canonical(
             "10³/µl",
             "x10³/µl",
         }:
+
             return conversion(
                 value * 1000,
                 "/µL",
@@ -635,6 +669,7 @@ def convert_to_canonical(
             "10⁹/l",
             "x10⁹/l",
         }:
+
             return conversion(
                 value * 1000,
                 "/µL",
@@ -647,6 +682,7 @@ def convert_to_canonical(
         if not raw_unit:
 
             if value >= 100:
+
                 return conversion(
                     value,
                     "/µL",
@@ -656,6 +692,7 @@ def convert_to_canonical(
                 )
 
             if 0.5 <= value <= 50:
+
                 return conversion(
                     value * 1000,
                     "/µL",
@@ -686,6 +723,7 @@ def convert_to_canonical(
             "cell/µl",
             "perµl",
         }:
+
             return conversion(
                 value,
                 "/µL",
@@ -701,6 +739,7 @@ def convert_to_canonical(
             "10³/µl",
             "x10³/µl",
         }:
+
             return conversion(
                 value * 1000,
                 "/µL",
@@ -716,6 +755,7 @@ def convert_to_canonical(
             "10⁹/l",
             "x10⁹/l",
         }:
+
             return conversion(
                 value * 1000,
                 "/µL",
@@ -737,6 +777,7 @@ def convert_to_canonical(
             "lakh/μl",
             "lakhperµl",
         }:
+
             return conversion(
                 value * 100000,
                 "/µL",
@@ -750,6 +791,7 @@ def convert_to_canonical(
 
             # Example: 152000
             if value >= 10000:
+
                 return conversion(
                     value,
                     "/µL",
@@ -760,6 +802,7 @@ def convert_to_canonical(
 
             # Example: 152 = 152 x10^3/µL
             if 50 <= value <= 1000:
+
                 return conversion(
                     value * 1000,
                     "/µL",
@@ -770,6 +813,7 @@ def convert_to_canonical(
 
             # Example: 1.52 lakh/µL
             if 0.1 <= value <= 10:
+
                 return conversion(
                     value * 100000,
                     "/µL",
@@ -803,6 +847,7 @@ def convert_to_canonical(
             "percent",
             "percentage",
         }:
+
             return conversion(
                 value,
                 "%",
@@ -815,6 +860,7 @@ def convert_to_canonical(
         if not raw_unit:
 
             if 0 <= value <= 1:
+
                 return conversion(
                     value * 100,
                     "%",
@@ -824,6 +870,7 @@ def convert_to_canonical(
                 )
 
             if 1 < value <= 100:
+
                 return conversion(
                     value,
                     "%",
@@ -853,6 +900,7 @@ def convert_to_canonical(
             "um3",
             "µm3",
         }:
+
             return conversion(
                 value,
                 "fL",
@@ -862,6 +910,7 @@ def convert_to_canonical(
             )
 
         if not raw_unit and 40 <= value <= 150:
+
             return conversion(
                 value,
                 "fL",
@@ -889,6 +938,7 @@ def convert_to_canonical(
             "picogram",
             "picograms",
         }:
+
             return conversion(
                 value,
                 "pg",
@@ -898,6 +948,7 @@ def convert_to_canonical(
             )
 
         if not raw_unit and 10 <= value <= 50:
+
             return conversion(
                 value,
                 "pg",
@@ -924,6 +975,7 @@ def convert_to_canonical(
             "g/dl",
             "gdl",
         }:
+
             return conversion(
                 value,
                 "g/dL",
@@ -933,6 +985,7 @@ def convert_to_canonical(
             )
 
         if raw_unit == "g/l":
+
             return conversion(
                 value / 10.0,
                 "g/dL",
@@ -942,6 +995,7 @@ def convert_to_canonical(
             )
 
         if not raw_unit and 20 <= value <= 45:
+
             return conversion(
                 value,
                 "g/dL",
@@ -969,6 +1023,7 @@ def convert_to_canonical(
             "percent",
             "percentage",
         }:
+
             return conversion(
                 value,
                 "%",
@@ -980,6 +1035,7 @@ def convert_to_canonical(
         if not raw_unit:
 
             if 0 <= value <= 1:
+
                 return conversion(
                     value * 100,
                     "%",
@@ -989,6 +1045,7 @@ def convert_to_canonical(
                 )
 
             if 5 <= value <= 50:
+
                 return conversion(
                     value,
                     "%",
@@ -1203,17 +1260,20 @@ def normalize_extraction(
     requires_manual_review = True
 
     if missing_fields:
+
         review_reason = (
             "Some CBC values are missing and must be reviewed."
         )
 
     elif review_flags:
+
         review_reason = (
             "Some values or unit conversions require review "
             "before model assessment."
         )
 
     else:
+
         review_reason = (
             "Values were successfully normalized, but "
             "manual verification is still required before "
@@ -1222,14 +1282,171 @@ def normalize_extraction(
 
     return {
         "raw_values": raw_values,
-        "values": normalized_values,
-        "units": normalized_units,
-        "missing_fields": missing_fields,
-        "conversions": conversions,
-        "review_flags": review_flags,
-        "requires_manual_review": requires_manual_review,
-        "review_reason": review_reason,
+
+        "values":
+            normalized_values,
+
+        "units":
+            normalized_units,
+
+        "missing_fields":
+            missing_fields,
+
+        "conversions":
+            conversions,
+
+        "review_flags":
+            review_flags,
+
+        "requires_manual_review":
+            requires_manual_review,
+
+        "review_reason":
+            review_reason,
     }
+
+
+# ============================================================
+# GEMINI EXTRACTION WITH MODEL FALLBACK
+# ============================================================
+#
+# Gemini can temporarily return:
+#
+#   503 UNAVAILABLE
+#
+# Instead of waiting for the SDK to retry the same model
+# repeatedly, we quickly move to another stable Flash model.
+#
+# Current fallback order:
+#
+#   Gemini 3.8 Flash
+#          ↓ 503
+#   Gemini 3.7 Flash
+#          ↓ 503
+#   Gemini 3.6 Flash
+#          ↓ 503
+#   Gemini 3.5 Flash
+#
+# All of these are stable Gemini 3 Flash model endpoints.
+# ============================================================
+
+def generate_cbc_extraction(
+    uploaded_file,
+):
+    """
+    Generate CBC extraction using Gemini.
+
+    A temporary 503 UNAVAILABLE response causes the function
+    to move to the next model.
+
+    Non-503 errors are immediately raised because they may
+    represent authentication, invalid-request, schema, or
+    other permanent problems.
+    """
+
+    models = [
+        "gemini-3.8-flash",
+        "gemini-3.7-flash",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+    ]
+
+    last_error = None
+
+    for index, model in enumerate(models):
+
+        try:
+
+            print(
+                f"🤖 Trying Gemini model: {model}"
+            )
+
+            response = client.models.generate_content(
+                model=model,
+                contents=[
+                    EXTRACTION_PROMPT,
+                    uploaded_file,
+                ],
+                config={
+                    "response_mime_type": "application/json",
+                    "response_schema": CBCExtraction,
+                },
+            )
+
+            print(
+                f"✅ Gemini extraction succeeded with {model}"
+            )
+
+            return response
+
+        except Exception as error:
+
+            last_error = error
+
+            error_text = str(error)
+
+            status_code = getattr(
+                error,
+                "code",
+                None,
+            )
+
+            is_503 = (
+                status_code == 503
+                or "503" in error_text
+                or "UNAVAILABLE" in error_text
+            )
+
+            # ------------------------------------------------
+            # Non-503 error
+            # ------------------------------------------------
+
+            if not is_503:
+
+                print(
+                    f"❌ Gemini extraction failed with "
+                    f"{model}: {error_text}"
+                )
+
+                raise
+
+            # ------------------------------------------------
+            # Temporary 503
+            # ------------------------------------------------
+
+            print(
+                f"⚠️ Gemini model {model} is temporarily "
+                f"unavailable."
+            )
+
+            print(
+                f"   Error: {error_text}"
+            )
+
+            # ------------------------------------------------
+            # Try next model
+            # ------------------------------------------------
+
+            if index < len(models) - 1:
+
+                next_model = models[index + 1]
+
+                print(
+                    f"🔄 Falling back to {next_model} "
+                    f"in 2 seconds..."
+                )
+
+                time.sleep(2)
+
+    # --------------------------------------------------------
+    # Every model failed
+    # --------------------------------------------------------
+
+    raise RuntimeError(
+        "Gemini report extraction is temporarily "
+        "unavailable. All configured Gemini models "
+        "returned a 503 UNAVAILABLE error."
+    ) from last_error
 
 
 # ============================================================
@@ -1262,19 +1479,16 @@ def extract_cbc_from_report(
         "🔎 Extracting CBC values and units..."
     )
 
-    response = client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=[
-            EXTRACTION_PROMPT,
-            uploaded_file,
-        ],
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": CBCExtraction,
-        },
+    # --------------------------------------------------------
+    # Gemini extraction with fallback
+    # --------------------------------------------------------
+
+    response = generate_cbc_extraction(
+        uploaded_file
     )
 
     if not response.text:
+
         raise RuntimeError(
             "Gemini returned an empty response."
         )
@@ -1442,6 +1656,7 @@ def main():
         if result["missing_fields"]:
 
             for field in result["missing_fields"]:
+
                 print(
                     f"  ⚠ {field}"
                 )
