@@ -1,94 +1,55 @@
 # ============================================================
 # AAROGYAM AI
-# CBC VISUAL REPORT EXTRACTOR + UNIT NORMALIZER
+# CBC TEXT REPORT EXTRACTOR + UNIT NORMALIZER
 # ============================================================
 #
 # PURPOSE:
-#   1. Read a CBC PDF/image using Gemini.
-#   2. Extract the patient's CBC RESULT and the unit shown
-#      on the report.
-#   3. Normalize different laboratory unit formats into the
+#   1. Read a text-based CBC PDF.
+#   2. Extract the patient's CBC RESULT values.
+#   3. Extract the units shown on the report.
+#   4. Normalize different laboratory units into the
 #      exact units expected by the CBC ML model.
-#   4. Flag ambiguous/unrecognized values for manual review.
+#   5. Flag ambiguous/unrecognized values for manual review.
 #
 # IMPORTANT:
 #   This file ONLY extracts and normalizes laboratory values.
 #
 #   It does NOT:
-#   - diagnose disease
-#   - predict dengue/malaria
+#   - diagnose the patient
+#   - predict diseases
 #   - calculate severity
 #   - interpret abnormal results
 #   - run XGBoost/LightGBM
 #
 # FLOW:
 #
-#   PDF / IMAGE
-#        ↓
-#   Gemini Vision
-#        ↓
-#   raw value + raw unit
-#        ↓
-#   unit normalization
-#        ↓
-#   canonical CBC values
-#        ↓
-#   doctor review
-#        ↓
+#   PDF
+#    ↓
+#   pdfplumber
+#    ↓
+#   CBC text extraction
+#    ↓
+#   CBC field matching
+#    ↓
+#   Unit normalization
+#    ↓
+#   Doctor review
+#    ↓
 #   /api/cbc/assess
+#
+# NOTE:
+#   This version intentionally avoids Gemini for normal
+#   text-based PDF CBC reports.
 #
 # ============================================================
 
 import json
-import os
+import re
 import sys
-import time
 from pathlib import Path
 from typing import Optional
 
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-from pydantic import BaseModel, Field
-
-
-# ============================================================
-# ENVIRONMENT
-# ============================================================
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
-load_dotenv(PROJECT_ROOT / ".env")
-
-API_KEY = os.getenv("GEMINI_API_KEY")
-
-if not API_KEY:
-    raise RuntimeError(
-        "GEMINI_API_KEY is not configured.\n"
-        "Add it to CBC_Aarogyam/.env"
-    )
-
-
-# ============================================================
-# GEMINI CLIENT
-# ============================================================
-#
-# Disable the SDK's long automatic retry cycle.
-# We handle temporary 503 failures ourselves using
-# model fallback below.
-# ============================================================
-
-client = genai.Client(
-    api_key=API_KEY,
-    http_options=types.HttpOptions(
-        retry_options=types.HttpRetryOptions(
-            attempts=1,
-            initial_delay=1,
-            max_delay=1,
-            jitter=0,
-        )
-    ),
-)
+import pdfplumber
 
 
 # ============================================================
@@ -118,197 +79,118 @@ CBC_FIELDS = list(CANONICAL_UNITS.keys())
 
 
 # ============================================================
-# GEMINI EXTRACTION SCHEMA
+# FIELD ALIASES
+# ============================================================
+#
+# These are the report labels that map to your ML fields.
 # ============================================================
 
-class CBCMeasurement(BaseModel):
-    value: Optional[float] = Field(
-        default=None,
-        description=(
-            "Numeric patient result exactly as shown on "
-            "the laboratory report."
-        ),
-    )
+FIELD_ALIASES = {
+    "Hb": [
+        "haemoglobin",
+        "hemoglobin",
+        "hgb",
+        "hb",
+    ],
 
-    unit: Optional[str] = Field(
-        default=None,
-        description=(
-            "Unit exactly as shown on the report. "
-            "Examples: g/dL, gm%, g/L, million/cumm, "
-            "/cumm, /uL, /µL, lakh/cumm, "
-            "10^3/uL, x10^9/L, %, fL, pg."
-        ),
-    )
+    "RBC": [
+        "rbc count",
+        "rbc",
+        "red blood cell count",
+        "red blood cells",
+        "erythrocytes",
+    ],
 
+    "WBC": [
+        "total leucocyte count",
+        "total leukocyte count",
+        "tlc",
+        "wbc count",
+        "wbc",
+        "white blood cell count",
+        "white blood cells",
+        "leukocytes",
+    ],
 
-class CBCExtraction(BaseModel):
-    Hb: CBCMeasurement = Field(default_factory=CBCMeasurement)
-    RBC: CBCMeasurement = Field(default_factory=CBCMeasurement)
-    WBC: CBCMeasurement = Field(default_factory=CBCMeasurement)
+    "Platelets": [
+        "platelet count",
+        "platelets",
+        "platelet",
+        "plt",
+    ],
 
-    Platelets: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
+    "Neutrophils": [
+        "neutrophils",
+        "neutrophil",
+        "neutrophils %",
+        "neutrophil %",
+        "neut",
+        "neu",
+    ],
 
-    Neutrophils: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
+    "Lymphocytes": [
+        "lymphocytes",
+        "lymphocyte",
+        "lymphocytes %",
+        "lymphocyte %",
+        "lymph",
+        "lym",
+    ],
 
-    Lymphocytes: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
+    "Monocytes": [
+        "monocytes",
+        "monocyte",
+        "monocytes %",
+        "monocyte %",
+        "mono",
+        "mon",
+    ],
 
-    Monocytes: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
+    "Eosinophils": [
+        "eosinophils",
+        "eosinophil",
+        "eosinophils %",
+        "eosinophil %",
+        "eos",
+    ],
 
-    Eosinophils: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
+    "Basophils": [
+        "basophils",
+        "basophil",
+        "basophils %",
+        "basophil %",
+        "baso",
+        "bas",
+    ],
 
-    Basophils: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
+    "MCV": [
+        "mcv",
+        "mean corpuscular volume",
+    ],
 
-    MCV: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
+    "MCH": [
+        "mch",
+        "mean corpuscular hemoglobin",
+        "mean corpuscular haemoglobin",
+    ],
 
-    MCH: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
+    "MCHC": [
+        "mchc",
+        "mean corpuscular hemoglobin concentration",
+        "mean corpuscular haemoglobin concentration",
+    ],
 
-    MCHC: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
-
-    RDW: CBCMeasurement = Field(
-        default_factory=CBCMeasurement
-    )
-
-
-# ============================================================
-# GEMINI EXTRACTION PROMPT
-# ============================================================
-
-EXTRACTION_PROMPT = """
-You are a laboratory report DATA EXTRACTION assistant.
-
-Your ONLY task is to read the uploaded CBC report and extract
-the patient's actual CBC result values.
-
-DO NOT:
-- diagnose the patient
-- identify diseases
-- interpret abnormalities
-- calculate severity
-- calculate derived values
-- infer missing values
-- invent values
-
-For every CBC parameter:
-
-1. Find the patient's RESULT value.
-2. Return the numeric value exactly as printed.
-3. Return the UNIT exactly as printed.
-4. If the value is absent or uncertain, return null.
-
-IMPORTANT:
-Return the patient's result, NOT the reference range.
-
-Examples:
-
-If the report says:
-Platelets 1.52 lakh/cumm
-
-return:
-
-value = 1.52
-unit = "lakh/cumm"
-
-Do NOT convert it yourself.
-
-If the report says:
-WBC 6200 /cumm
-
-return:
-
-value = 6200
-unit = "/cumm"
-
-If the report says:
-Hemoglobin 9.0 gm%
-
-return:
-
-value = 9.0
-unit = "gm%"
-
-If the report says:
-RBC 3.13 Million/cumm
-
-return:
-
-value = 3.13
-unit = "Million/cumm"
-
-FIELD ALIASES:
-
-Hb:
-Hb, HGB, Hemoglobin, Haemoglobin
-
-RBC:
-RBC, RBC Count, Red Blood Cell Count,
-Red Blood Cells, Erythrocytes
-
-WBC:
-WBC, WBC Count, White Blood Cell Count,
-White Blood Cells, Leukocytes, TLC,
-Total Leukocyte Count
-
-Platelets:
-Platelets, Platelet, Platelet Count, PLT
-
-Neutrophils:
-Neutrophils, Neutrophil, Neutrophils %,
-Neutrophil %, Neut, NEU
-
-Lymphocytes:
-Lymphocytes, Lymphocyte, Lymphocytes %,
-Lymphocyte %, Lymph, LYM
-
-Monocytes:
-Monocytes, Monocyte, Monocytes %,
-Monocyte %, Mono, MONO
-
-Eosinophils:
-Eosinophils, Eosinophil, Eosinophils %,
-Eosinophil %, Eos, EOS
-
-Basophils:
-Basophils, Basophil, Basophils %,
-Basophil %, Baso, BASO
-
-MCV:
-MCV, Mean Corpuscular Volume
-
-MCH:
-MCH, Mean Corpuscular Hemoglobin,
-Mean Corpuscular Haemoglobin
-
-MCHC:
-MCHC, Mean Corpuscular Hemoglobin Concentration,
-Mean Corpuscular Haemoglobin Concentration
-
-RDW:
-RDW, RDW-CV, Red Cell Distribution Width
-
-Do not guess a unit if it is not visible.
-"""
+    "RDW": [
+        "rdw-cv",
+        "rdw cv",
+        "rdw",
+        "red cell distribution width",
+    ],
+}
 
 
 # ============================================================
-# FILE VALIDATION
+# ALLOWED FILE TYPES
 # ============================================================
 
 ALLOWED_EXTENSIONS = {
@@ -319,7 +201,20 @@ ALLOWED_EXTENSIONS = {
 }
 
 
+# ============================================================
+# FILE VALIDATION
+# ============================================================
+
 def validate_file(file_path: str) -> Path:
+    """
+    Validate the uploaded file.
+
+    Normal CBC extraction in this version is supported for
+    text-based PDF reports.
+
+    Images are accepted by the API layer but require OCR,
+    which is intentionally not performed here.
+    """
 
     path = Path(file_path)
 
@@ -333,7 +228,9 @@ def validate_file(file_path: str) -> Path:
             f"Path is not a file: {file_path}"
         )
 
-    if path.suffix.lower() not in ALLOWED_EXTENSIONS:
+    extension = path.suffix.lower()
+
+    if extension not in ALLOWED_EXTENSIONS:
         raise ValueError(
             "Unsupported file type. "
             "Use PDF, PNG, JPG, or JPEG."
@@ -343,22 +240,51 @@ def validate_file(file_path: str) -> Path:
 
 
 # ============================================================
-# UNIT TEXT NORMALIZATION
+# SAFE FLOAT
 # ============================================================
-#
-# Converts many visually different representations into
-# consistent internal unit strings.
-#
-# Examples:
-#
-# gm%             -> g/dl
-# Million/cumm    -> million/µl
-# /cumm           -> /µl
-# lakh/cumm       -> lakh/µl
-# x 10^3/µL       -> x10^3/µl
+
+def safe_float(value) -> Optional[float]:
+    """
+    Convert a value safely to float.
+    """
+
+    if value is None:
+        return None
+
+    try:
+        text = str(value).strip()
+
+        # Remove thousands separators.
+        text = text.replace(",", "")
+
+        result = float(text)
+
+        # NaN check.
+        if result != result:
+            return None
+
+        return result
+
+    except (TypeError, ValueError):
+        return None
+
+
+# ============================================================
+# UNIT TEXT NORMALIZATION
 # ============================================================
 
 def normalize_unit(unit: Optional[str]) -> str:
+    """
+    Normalize visually different representations of units.
+
+    Examples:
+
+        gm%            -> g/dl
+        Million/cumm   -> million/µl
+        /cumm          -> /µl
+        lakh/cumm      -> lakh/µl
+        x10^3/µL       -> x10^3/µl
+    """
 
     if unit is None:
         return ""
@@ -374,7 +300,7 @@ def normalize_unit(unit: Optional[str]) -> str:
     u = u.replace("−", "-")
 
     # --------------------------------------------------------
-    # Remove spaces
+    # Normalize spaces
     # --------------------------------------------------------
 
     u = " ".join(u.split())
@@ -387,9 +313,6 @@ def normalize_unit(unit: Optional[str]) -> str:
     u = u.replace("microliter", "µl")
     u = u.replace("microlitre", "µl")
 
-    u = u.replace("milliliter", "ml")
-    u = u.replace("millilitre", "ml")
-
     # --------------------------------------------------------
     # Cubic millimeter / cubic mm
     #
@@ -398,8 +321,8 @@ def normalize_unit(unit: Optional[str]) -> str:
 
     cubic_variants = [
         "cumm",
-        "cu.mm",
         "cu.mm.",
+        "cu.mm",
         "cu_mm",
         "cubicmm",
         "cubic-mm",
@@ -427,31 +350,10 @@ def normalize_unit(unit: Optional[str]) -> str:
     # --------------------------------------------------------
 
     u = u.replace("lakhs", "lakh")
-    u = u.replace("lac", "lakh")
     u = u.replace("lacs", "lakh")
+    u = u.replace("lac", "lakh")
 
     return u
-
-
-# ============================================================
-# SAFE FLOAT
-# ============================================================
-
-def safe_float(value) -> Optional[float]:
-
-    if value is None:
-        return None
-
-    try:
-        result = float(value)
-
-        if result != result:  # NaN
-            return None
-
-        return result
-
-    except (TypeError, ValueError):
-        return None
 
 
 # ============================================================
@@ -497,7 +399,6 @@ def convert_to_canonical(
     """
 
     value = safe_float(value)
-
     raw_unit = normalize_unit(unit)
 
     canonical = CANONICAL_UNITS[field]
@@ -522,7 +423,6 @@ def convert_to_canonical(
 
     if field == "Hb":
 
-        # gm%, g%, g/dL
         if raw_unit in {
             "g/dl",
             "g/dl.",
@@ -531,12 +431,11 @@ def convert_to_canonical(
             return conversion(
                 value,
                 "g/dL",
-                "Converted/stabilized Hb unit to g/dL.",
+                "Standardized Hb unit to g/dL.",
                 True,
                 False,
             )
 
-        # g/L -> g/dL
         if raw_unit == "g/l":
 
             return conversion(
@@ -547,7 +446,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # Unit missing
         if not raw_unit and 4 <= value <= 25:
 
             return conversion(
@@ -572,12 +470,9 @@ def convert_to_canonical(
 
     if field == "RBC":
 
-        # million/cumm, million/µL, million/uL
         if raw_unit in {
             "million/µl",
             "million/ul",
-            "million/μl",
-            "million/uµl",
         }:
 
             return conversion(
@@ -588,7 +483,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # 10^12/L is numerically equivalent to million/µL
         if raw_unit in {
             "10^12/l",
             "x10^12/l",
@@ -604,7 +498,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # Unit missing
         if not raw_unit and 1 <= value <= 10:
 
             return conversion(
@@ -629,7 +522,6 @@ def convert_to_canonical(
 
     if field == "WBC":
 
-        # Direct count
         if raw_unit in {
             "/µl",
             "µl",
@@ -646,7 +538,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # 10^3/µL
         if raw_unit in {
             "10^3/µl",
             "x10^3/µl",
@@ -662,7 +553,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # 10^9/L = 10^3/µL
         if raw_unit in {
             "10^9/l",
             "x10^9/l",
@@ -678,7 +568,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # Unit missing
         if not raw_unit:
 
             if value >= 100:
@@ -715,7 +604,6 @@ def convert_to_canonical(
 
     if field == "Platelets":
 
-        # Direct count
         if raw_unit in {
             "/µl",
             "µl",
@@ -732,7 +620,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # 10^3/µL
         if raw_unit in {
             "10^3/µl",
             "x10^3/µl",
@@ -748,7 +635,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # 10^9/L
         if raw_unit in {
             "10^9/l",
             "x10^9/l",
@@ -764,17 +650,9 @@ def convert_to_canonical(
                 False,
             )
 
-        # lakh/µL
-        #
-        # 1 lakh = 100,000
-        #
-        # 1.52 lakh/µL
-        #       ↓
-        # 152,000 /µL
         if raw_unit in {
             "lakh/µl",
             "lakh/ul",
-            "lakh/μl",
             "lakhperµl",
         }:
 
@@ -786,10 +664,8 @@ def convert_to_canonical(
                 False,
             )
 
-        # Unit missing
         if not raw_unit:
 
-            # Example: 152000
             if value >= 10000:
 
                 return conversion(
@@ -800,7 +676,6 @@ def convert_to_canonical(
                     True,
                 )
 
-            # Example: 152 = 152 x10^3/µL
             if 50 <= value <= 1000:
 
                 return conversion(
@@ -811,7 +686,6 @@ def convert_to_canonical(
                     True,
                 )
 
-            # Example: 1.52 lakh/µL
             if 0.1 <= value <= 10:
 
                 return conversion(
@@ -856,7 +730,6 @@ def convert_to_canonical(
                 False,
             )
 
-        # Missing unit
         if not raw_unit:
 
             if 0 <= value <= 1:
@@ -1068,7 +941,7 @@ def convert_to_canonical(
 
     return conversion(
         value,
-        CANONICAL_UNITS[field],
+        canonical,
         "No conversion rule available.",
         False,
         True,
@@ -1111,6 +984,7 @@ def plausibility_check(
     low, high = PLAUSIBILITY_RANGES[field]
 
     if value < low or value > high:
+
         return (
             f"{field} normalized value {value} is outside "
             f"the parser plausibility range {low}–{high}."
@@ -1120,47 +994,452 @@ def plausibility_check(
 
 
 # ============================================================
+# PDF TEXT EXTRACTION
+# ============================================================
+
+def extract_pdf_text(file_path: str) -> str:
+    """
+    Extract text from all PDF pages using pdfplumber.
+    """
+
+    path = validate_file(file_path)
+
+    if path.suffix.lower() != ".pdf":
+
+        raise ValueError(
+            "This parser currently supports text-based PDF "
+            "CBC reports. Image OCR is not enabled."
+        )
+
+    pages_text = []
+
+    try:
+
+        with pdfplumber.open(path) as pdf:
+
+            if not pdf.pages:
+
+                raise ValueError(
+                    "The PDF contains no pages."
+                )
+
+            for page_number, page in enumerate(
+                pdf.pages,
+                start=1,
+            ):
+
+                text = page.extract_text()
+
+                if text:
+
+                    pages_text.append(
+                        text
+                    )
+
+    except Exception as error:
+
+        raise RuntimeError(
+            f"Unable to read PDF: {error}"
+        ) from error
+
+    full_text = "\n".join(
+        pages_text
+    )
+
+    if not full_text.strip():
+
+        raise ValueError(
+            "No readable text was found in this PDF. "
+            "This may be a scanned/image-only report."
+        )
+
+    return full_text
+
+
+# ============================================================
+# TEXT NORMALIZATION
+# ============================================================
+
+def normalize_line(line: str) -> str:
+    """
+    Normalize whitespace while keeping the actual content.
+    """
+
+    line = line.replace("\xa0", " ")
+
+    line = re.sub(
+        r"\s+",
+        " ",
+        line,
+    )
+
+    return line.strip()
+
+
+# ============================================================
+# FIELD LABEL DETECTION
+# ============================================================
+
+def find_field_for_line(line: str) -> Optional[str]:
+    """
+    Determine whether a line represents one of the CBC fields.
+
+    Matching is done against the beginning of the line so that
+    things such as 'Absolute Neutrophils' do not accidentally
+    become 'Neutrophils'.
+    """
+
+    cleaned = normalize_line(line)
+
+    lower = cleaned.lower()
+
+    # Longest aliases first to prevent:
+    #
+    #   "rbc count"
+    #
+    # from being interpreted as just "rbc".
+
+    candidates = []
+
+    for field, aliases in FIELD_ALIASES.items():
+
+        for alias in aliases:
+
+            candidates.append(
+                (
+                    field,
+                    alias,
+                )
+            )
+
+    candidates.sort(
+        key=lambda item: len(item[1]),
+        reverse=True,
+    )
+
+    for field, alias in candidates:
+
+        pattern = (
+            r"^"
+            + re.escape(alias)
+            + r"(?=\s|:|$)"
+        )
+
+        if re.search(
+            pattern,
+            lower,
+        ):
+
+            return field
+
+    return None
+
+
+# ============================================================
+# UNIT DETECTION
+# ============================================================
+
+UNIT_PATTERNS = [
+    # More specific units first.
+    r"million\s*/\s*cumm",
+    r"million\s*/\s*ul",
+    r"million\s*/\s*µl",
+    r"lakh\s*/\s*cumm",
+    r"lakh\s*/\s*ul",
+    r"lakh\s*/\s*µl",
+
+    r"x\s*10\^3\s*/\s*µl",
+    r"x\s*10\^3\s*/\s*ul",
+    r"10\^3\s*/\s*µl",
+    r"10\^3\s*/\s*ul",
+
+    r"x\s*10\^9\s*/\s*l",
+    r"10\^9\s*/\s*l",
+
+    r"gm\s*%",
+    r"gms\s*%",
+    r"g\s*%",
+
+    r"g\s*/\s*dl",
+    r"g\s*/\s*l",
+
+    r"/\s*cumm",
+    r"/\s*ul",
+    r"/\s*µl",
+
+    r"cells\s*/\s*µl",
+    r"cells\s*/\s*ul",
+
+    r"cell\s*/\s*µl",
+    r"cell\s*/\s*ul",
+
+    r"per\s*µl",
+    r"per\s*ul",
+
+    r"fL",
+    r"fl",
+
+    r"pg",
+
+    r"%",
+
+    r"percent",
+    r"percentage",
+]
+
+
+def extract_unit_from_line(line: str) -> Optional[str]:
+    """
+    Find the laboratory unit near the end of the line.
+
+    We deliberately prefer the last unit because reference
+    ranges can also contain '%' or other symbols.
+    """
+
+    cleaned = normalize_line(line)
+
+    matches = []
+
+    for pattern in UNIT_PATTERNS:
+
+        for match in re.finditer(
+            pattern,
+            cleaned,
+            flags=re.IGNORECASE,
+        ):
+
+            matches.append(
+                match
+            )
+
+    if not matches:
+        return None
+
+    # Use the right-most match.
+    match = max(
+        matches,
+        key=lambda item: item.end(),
+    )
+
+    # Only accept a unit that occurs close to the end.
+    trailing = cleaned[
+        match.end():
+    ].strip()
+
+    # A CBC line normally has the unit as the final token.
+    if trailing:
+        return None
+
+    return match.group(0)
+
+
+# ============================================================
+# NUMERIC VALUE EXTRACTION
+# ============================================================
+
+def extract_first_numeric_value(
+    text: str,
+) -> Optional[float]:
+    """
+    Extract the first numeric value from the portion of a
+    CBC line after its field label.
+
+    This is intentional.
+
+    Example:
+
+        Haemoglobin 13.0 11.5 - 18.0 gm%
+
+    The first number is the patient result:
+
+        13.0
+
+    while the later numbers are the biological reference
+    range and must be ignored.
+    """
+
+    number_pattern = (
+        r"(?<![A-Za-z])"
+        r"-?"
+        r"\d+(?:[.,]\d+)?"
+        r"(?![A-Za-z])"
+    )
+
+    match = re.search(
+        number_pattern,
+        text,
+    )
+
+    if not match:
+        return None
+
+    return safe_float(
+        match.group(0)
+    )
+
+
+# ============================================================
+# REMOVE FIELD LABEL
+# ============================================================
+
+def remove_field_label(
+    line: str,
+    field: str,
+) -> str:
+    """
+    Remove the recognized field label from the beginning
+    of a CBC line.
+    """
+
+    cleaned = normalize_line(line)
+
+    lower = cleaned.lower()
+
+    aliases = sorted(
+        FIELD_ALIASES[field],
+        key=len,
+        reverse=True,
+    )
+
+    for alias in aliases:
+
+        pattern = (
+            r"^"
+            + re.escape(alias)
+            + r"(?=\s|:|$)"
+        )
+
+        match = re.match(
+            pattern,
+            lower,
+        )
+
+        if match:
+
+            return cleaned[
+                match.end():
+            ].strip()
+
+    return cleaned
+
+
+# ============================================================
+# PARSE CBC TEXT
+# ============================================================
+
+def parse_cbc_text(
+    text: str,
+) -> dict:
+    """
+    Parse CBC values from extracted PDF text.
+
+    This parser intentionally ignores:
+        - patient metadata
+        - absolute leukocyte counts
+        - reference ranges
+        - Widal/serology
+        - administrative text
+    """
+
+    extracted = {}
+
+    lines = text.splitlines()
+
+    for raw_line in lines:
+
+        line = normalize_line(
+            raw_line
+        )
+
+        if not line:
+            continue
+
+        field = find_field_for_line(
+            line
+        )
+
+        if field is None:
+            continue
+
+        # ----------------------------------------------------
+        # Ignore duplicates once we have a confident result.
+        # ----------------------------------------------------
+
+        if field in extracted:
+            continue
+
+        remainder = remove_field_label(
+            line,
+            field,
+        )
+
+        if not remainder:
+            continue
+
+        unit = extract_unit_from_line(
+            remainder
+        )
+
+        value = extract_first_numeric_value(
+            remainder
+        )
+
+        if value is None:
+            continue
+
+        extracted[field] = {
+            "value": value,
+            "unit": unit,
+            "source_line": line,
+        }
+
+    return extracted
+
+
+# ============================================================
 # NORMALIZE COMPLETE EXTRACTION
 # ============================================================
 
 def normalize_extraction(
-    extracted: CBCExtraction,
+    extracted: dict,
 ) -> dict:
-
-    extracted_data = extracted.model_dump()
+    """
+    Convert extracted raw values into the canonical units
+    expected by the ML model.
+    """
 
     raw_values = {}
+
     normalized_values = {}
+
     normalized_units = {}
 
     conversions = []
+
     review_flags = []
+
     missing_fields = []
+
+    # --------------------------------------------------------
+    # Process every required CBC field.
+    # --------------------------------------------------------
 
     for field in CBC_FIELDS:
 
-        measurement = extracted_data[field]
-
-        raw_value = safe_float(
-            measurement.get("value")
+        measurement = extracted.get(
+            field
         )
 
-        raw_unit = measurement.get("unit")
-
         # ----------------------------------------------------
-        # Preserve exactly what Gemini extracted
+        # Missing field
         # ----------------------------------------------------
 
-        raw_values[field] = {
-            "value": raw_value,
-            "unit": raw_unit,
-        }
+        if measurement is None:
 
-        # ----------------------------------------------------
-        # Missing
-        # ----------------------------------------------------
-
-        if raw_value is None:
+            raw_values[field] = {
+                "value": None,
+                "unit": None,
+            }
 
             normalized_values[field] = None
 
@@ -1168,7 +1447,9 @@ def normalize_extraction(
                 CANONICAL_UNITS[field]
             )
 
-            missing_fields.append(field)
+            missing_fields.append(
+                field
+            )
 
             review_flags.append({
                 "type": "missing_value",
@@ -1182,8 +1463,25 @@ def normalize_extraction(
 
             continue
 
+        raw_value = safe_float(
+            measurement.get("value")
+        )
+
+        raw_unit = measurement.get(
+            "unit"
+        )
+
         # ----------------------------------------------------
-        # Conversion
+        # Preserve raw value/unit
+        # ----------------------------------------------------
+
+        raw_values[field] = {
+            "value": raw_value,
+            "unit": raw_unit,
+        }
+
+        # ----------------------------------------------------
+        # Convert
         # ----------------------------------------------------
 
         (
@@ -1198,8 +1496,13 @@ def normalize_extraction(
             raw_unit,
         )
 
-        normalized_values[field] = normalized_value
-        normalized_units[field] = normalized_unit
+        normalized_values[field] = (
+            normalized_value
+        )
+
+        normalized_units[field] = (
+            normalized_unit
+        )
 
         # ----------------------------------------------------
         # Record conversion
@@ -1229,17 +1532,21 @@ def normalize_extraction(
                 "message": conversion_note,
                 "raw_value": raw_value,
                 "raw_unit": raw_unit,
-                "normalized_value": normalized_value,
-                "normalized_unit": normalized_unit,
+                "normalized_value":
+                    normalized_value,
+                "normalized_unit":
+                    normalized_unit,
             })
 
         # ----------------------------------------------------
         # Plausibility check
         # ----------------------------------------------------
 
-        plausibility_error = plausibility_check(
-            field,
-            normalized_value,
+        plausibility_error = (
+            plausibility_check(
+                field,
+                normalized_value,
+            )
         )
 
         if plausibility_error:
@@ -1249,12 +1556,14 @@ def normalize_extraction(
                 "field": field,
                 "severity": "attention",
                 "message": plausibility_error,
-                "normalized_value": normalized_value,
-                "normalized_unit": normalized_unit,
+                "normalized_value":
+                    normalized_value,
+                "normalized_unit":
+                    normalized_unit,
             })
 
     # --------------------------------------------------------
-    # Manual review is ALWAYS required before model inference
+    # Manual review is always required before model inference.
     # --------------------------------------------------------
 
     requires_manual_review = True
@@ -1282,171 +1591,15 @@ def normalize_extraction(
 
     return {
         "raw_values": raw_values,
-
-        "values":
-            normalized_values,
-
-        "units":
-            normalized_units,
-
-        "missing_fields":
-            missing_fields,
-
-        "conversions":
-            conversions,
-
-        "review_flags":
-            review_flags,
-
+        "values": normalized_values,
+        "units": normalized_units,
+        "missing_fields": missing_fields,
+        "conversions": conversions,
+        "review_flags": review_flags,
         "requires_manual_review":
             requires_manual_review,
-
-        "review_reason":
-            review_reason,
+        "review_reason": review_reason,
     }
-
-
-# ============================================================
-# GEMINI EXTRACTION WITH MODEL FALLBACK
-# ============================================================
-#
-# Gemini can temporarily return:
-#
-#   503 UNAVAILABLE
-#
-# Instead of waiting for the SDK to retry the same model
-# repeatedly, we quickly move to another stable Flash model.
-#
-# Current fallback order:
-#
-#   Gemini 3.8 Flash
-#          ↓ 503
-#   Gemini 3.7 Flash
-#          ↓ 503
-#   Gemini 3.6 Flash
-#          ↓ 503
-#   Gemini 3.5 Flash
-#
-# All of these are stable Gemini 3 Flash model endpoints.
-# ============================================================
-
-def generate_cbc_extraction(
-    uploaded_file,
-):
-    """
-    Generate CBC extraction using Gemini.
-
-    A temporary 503 UNAVAILABLE response causes the function
-    to move to the next model.
-
-    Non-503 errors are immediately raised because they may
-    represent authentication, invalid-request, schema, or
-    other permanent problems.
-    """
-
-    models = [
-        "gemini-3.8-flash",
-        "gemini-3.7-flash",
-        "gemini-3.6-flash",
-        "gemini-3.5-flash",
-    ]
-
-    last_error = None
-
-    for index, model in enumerate(models):
-
-        try:
-
-            print(
-                f"🤖 Trying Gemini model: {model}"
-            )
-
-            response = client.models.generate_content(
-                model=model,
-                contents=[
-                    EXTRACTION_PROMPT,
-                    uploaded_file,
-                ],
-                config={
-                    "response_mime_type": "application/json",
-                    "response_schema": CBCExtraction,
-                },
-            )
-
-            print(
-                f"✅ Gemini extraction succeeded with {model}"
-            )
-
-            return response
-
-        except Exception as error:
-
-            last_error = error
-
-            error_text = str(error)
-
-            status_code = getattr(
-                error,
-                "code",
-                None,
-            )
-
-            is_503 = (
-                status_code == 503
-                or "503" in error_text
-                or "UNAVAILABLE" in error_text
-            )
-
-            # ------------------------------------------------
-            # Non-503 error
-            # ------------------------------------------------
-
-            if not is_503:
-
-                print(
-                    f"❌ Gemini extraction failed with "
-                    f"{model}: {error_text}"
-                )
-
-                raise
-
-            # ------------------------------------------------
-            # Temporary 503
-            # ------------------------------------------------
-
-            print(
-                f"⚠️ Gemini model {model} is temporarily "
-                f"unavailable."
-            )
-
-            print(
-                f"   Error: {error_text}"
-            )
-
-            # ------------------------------------------------
-            # Try next model
-            # ------------------------------------------------
-
-            if index < len(models) - 1:
-
-                next_model = models[index + 1]
-
-                print(
-                    f"🔄 Falling back to {next_model} "
-                    f"in 2 seconds..."
-                )
-
-                time.sleep(2)
-
-    # --------------------------------------------------------
-    # Every model failed
-    # --------------------------------------------------------
-
-    raise RuntimeError(
-        "Gemini report extraction is temporarily "
-        "unavailable. All configured Gemini models "
-        "returned a 503 UNAVAILABLE error."
-    ) from last_error
 
 
 # ============================================================
@@ -1456,58 +1609,67 @@ def generate_cbc_extraction(
 def extract_cbc_from_report(
     file_path: str,
 ) -> dict:
+    """
+    Main CBC extraction entry point used by backend/main.py.
+    """
 
-    path = validate_file(file_path)
+    path = validate_file(
+        file_path
+    )
 
     print(
         f"\n📄 Report: {path.name}"
     )
 
     print(
-        "📤 Uploading report to Gemini..."
+        "📖 Reading CBC PDF locally with pdfplumber..."
     )
 
-    uploaded_file = client.files.upload(
-        file=str(path)
-    )
-
-    print(
-        "✅ Report uploaded"
+    text = extract_pdf_text(
+        str(path)
     )
 
     print(
-        "🔎 Extracting CBC values and units..."
+        "✅ PDF text extracted"
+    )
+
+    print(
+        "🔎 Searching for CBC values..."
+    )
+
+    parsed = parse_cbc_text(
+        text
     )
 
     # --------------------------------------------------------
-    # Gemini extraction with fallback
+    # Diagnostic output
     # --------------------------------------------------------
 
-    response = generate_cbc_extraction(
-        uploaded_file
+    print(
+        f"✅ Found {len(parsed)} CBC fields"
     )
 
-    if not response.text:
+    for field in CBC_FIELDS:
 
-        raise RuntimeError(
-            "Gemini returned an empty response."
-        )
+        if field in parsed:
 
-    # --------------------------------------------------------
-    # Validate structured Gemini response
-    # --------------------------------------------------------
-
-    extracted = CBCExtraction.model_validate_json(
-        response.text
-    )
+            print(
+                f"   {field}: "
+                f"{parsed[field]['value']} "
+                f"{parsed[field]['unit']}"
+            )
 
     # --------------------------------------------------------
-    # Normalize units
+    # Normalize
     # --------------------------------------------------------
 
     normalized = normalize_extraction(
-        extracted
+        parsed
     )
+
+    # --------------------------------------------------------
+    # Final result
+    # --------------------------------------------------------
 
     return {
         "success": True,
@@ -1541,10 +1703,11 @@ def extract_cbc_from_report(
 
         "message":
             (
-                "CBC values were extracted and normalized "
-                "to the canonical units expected by the "
-                "Aarogyam CBC model. Verify the extracted "
-                "values before running the assessment."
+                "CBC values were extracted from the PDF "
+                "and normalized to the canonical units "
+                "expected by the Aarogyam CBC model. "
+                "Verify the extracted values before "
+                "running the assessment."
             ),
     }
 
@@ -1560,7 +1723,7 @@ def main():
     )
 
     print(
-        "AAROGYAM AI — CBC VISUAL REPORT EXTRACTOR"
+        "AAROGYAM AI — CBC PDF TEXT EXTRACTOR"
     )
 
     print(
@@ -1619,7 +1782,7 @@ def main():
             )
 
         # ----------------------------------------------------
-        # Conversions
+        # Unit conversions
         # ----------------------------------------------------
 
         print(
@@ -1628,7 +1791,9 @@ def main():
 
         if result["conversions"]:
 
-            for item in result["conversions"]:
+            for item in result[
+                "conversions"
+            ]:
 
                 print(
                     f"  • {item['field']}: "
@@ -1636,7 +1801,8 @@ def main():
                     f"{item['from_unit']} "
                     f"→ "
                     f"{item['to_value']} "
-                    f"{item['to_unit']}"
+                    f"{item['to_unit']} "
+                    f"({item['note']})"
                 )
 
         else:
@@ -1646,7 +1812,7 @@ def main():
             )
 
         # ----------------------------------------------------
-        # Missing
+        # Missing fields
         # ----------------------------------------------------
 
         print(
@@ -1655,7 +1821,9 @@ def main():
 
         if result["missing_fields"]:
 
-            for field in result["missing_fields"]:
+            for field in result[
+                "missing_fields"
+            ]:
 
                 print(
                     f"  ⚠ {field}"
@@ -1677,7 +1845,9 @@ def main():
 
         if result["review_flags"]:
 
-            for flag in result["review_flags"]:
+            for flag in result[
+                "review_flags"
+            ]:
 
                 print(
                     f"  ⚠ {flag['field']}: "
@@ -1700,13 +1870,15 @@ def main():
 
         print(
             "  REQUIRED"
-            if result["requires_manual_review"]
+            if result[
+                "requires_manual_review"
+            ]
             else
             "  Not required"
         )
 
         # ----------------------------------------------------
-        # Full result
+        # Full JSON
         # ----------------------------------------------------
 
         print(
